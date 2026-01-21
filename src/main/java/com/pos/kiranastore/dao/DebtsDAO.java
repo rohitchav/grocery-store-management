@@ -35,19 +35,42 @@ public class DebtsDAO {
         return debtors;
     }
 
+    
     public boolean payDebt(int customerId, double paidAmount) {
-        String sql = "UPDATE customers SET outstanding = outstanding - ? WHERE id = ? AND outstanding >= ?";
         boolean success = false;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String updateCustomerSql =
+            "UPDATE customers SET outstanding = outstanding - ? " +
+            "WHERE id = ? AND outstanding >= ?";
 
-            ps.setDouble(1, paidAmount);
-            ps.setInt(2, customerId);
-            ps.setDouble(3, paidAmount);
+        String closeBillSql =
+            "UPDATE bills SET status = 'PAID' " +
+            "WHERE customer_id = ? AND status = 'OPEN'";
 
-            int rows = ps.executeUpdate();
-            success = rows > 0;
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false); // 🔐 transaction
+
+            // 1️⃣ Reduce outstanding
+            try (PreparedStatement ps = conn.prepareStatement(updateCustomerSql)) {
+                ps.setDouble(1, paidAmount);
+                ps.setInt(2, customerId);
+                ps.setDouble(3, paidAmount);
+
+                int rows = ps.executeUpdate();
+                if (rows == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            // 2️⃣ Close OPEN bills
+            try (PreparedStatement ps2 = conn.prepareStatement(closeBillSql)) {
+                ps2.setInt(1, customerId);
+                ps2.executeUpdate();
+            }
+
+            conn.commit();
+            success = true;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,4 +78,5 @@ public class DebtsDAO {
 
         return success;
     }
+
 }

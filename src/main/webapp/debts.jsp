@@ -7,7 +7,8 @@
 <link rel="icon" href="assets/images/debt.png" type="image/png">
 
 <link rel="stylesheet" href="assets/css/common.css">
-<link rel="stylesheet" href="assets/css/debts.css">
+<link rel="stylesheet" href="assets/css/customer.css">
+<!-- <link rel="stylesheet" href="assets/css/debts.css">  -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- AngularJS -->
@@ -16,32 +17,43 @@
 <body>
 
 <jsp:include page="navbar.jsp" />
-<%@ include file="sidebar.jsp" %>
+<%-- <%@ include file="sidebar.jsp" %> --%>
 
 <div ng-app="debtsApp" ng-controller="DebtsController" class="debts-wrapper">
 
-    <div class="debts-header">
-        <h2><i class="fas fa-money-bill-wave"></i> ${lblCustomerDebts}</h2>
-    </div>
+        <div>
+            <%@ include file="sidebar.jsp" %>
+        </div>
 
-    <div class="debts-list">
-        <div class="debts-card" ng-repeat="c in customers" ng-click="openPayForm(c)">
-            <h3 class="customer-name">{{c.name}}</h3>
-            <p class="phone-number">{{c.phone}}</p>
-            <p class="address">{{c.address}}</p>
-            <hr>
-            <div class="balance-row">
-                <div>
-                    <p class="balance-label">${lblOutstandingAmount}</p>
-                    <p class="balance-amount">₹{{c.outstanding}}</p>
+        <!-- Main Customer Section -->
+        <div class="customer-container">
+            <div class="header-customer">
+                <h2><span class="icon">👥</span>${lblCustomerDebts}</h2>
+                <div class="search-add">
+                   <input type="text" placeholder="Search customers..." class="search-box"
+                     ng-model="searchQuery" ng-change="searchCustomers()">
+
+                    <button class="add-button" ng-click="openModal()"> ${lblAddCustomer}</button>
                 </div>
             </div>
-        </div>
 
-        <div ng-if="customers.length == 0" style="margin-top:20px;">
-            No customers with outstanding balance.
+            <!-- Example Static Customer -->
+         <div class="customer-list" ng-repeat="c in customers" >
+			<div class="customer-card" ng-click="openPayForm(c)">
+			  <h3 class="customer-name">{{c.name}}</h3>
+			  <p class="phone-number">{{c.phone}}</p>
+			  <hr>
+			
+			  <div class="balance-row">
+			    <div>
+			      <p class="balance-label">${lblOutstanding}</p>
+			      <p class="balance-amount">₹{{c.outstanding}}.00</p>
+			    </div>
+			
+			  </div>
+			</div>
+         </div>
         </div>
-    </div>
 
     <!-- Payment Modal -->
     <div class="modal-overlay" ng-show="showModal">

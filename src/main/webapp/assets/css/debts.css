@@ -15,16 +15,16 @@
 
 /* Optional: Center the section itself when bill view is active */
 .debts-wrapper {
-    margin-left: 220px;
-    margin-top: 90px;
+    margin-left: 220px;   /* sidebar width */
+    margin-top: 90px;    /* navbar height */
     padding: 20px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+
     display: flex;
-    flex-direction: column;
-    align-items: center; /* ✅ centers child elements horizontally */
+    flex-direction: row; /* sidebar + content */
+    align-items: flex-start; /* ✅ LEFT aligned */
 }
+
 
 
 .debts-header h2 {
